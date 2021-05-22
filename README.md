@@ -1,15 +1,17 @@
 ## Plugin is in development! You can use it on your sites on your own
 
-# Used Elementor Widgets plugin for WordPress
+# Used Elementor Forms plugin for WordPress
 
 ### Purpose:
-Less plugins you have on site, faster it's working(usually). But sometimes you couldn't say if the plugin is used on website or not.
-This plugin (should) help to understand, which Elementor widgets from the external plugins are active and used on pages on the current website.
-This plugin should be enabled only for checking, and disabled after that.
-
-
-Keep in mind, that the plugins which contains elementor widgets could also have additional features adding some features to the Advanced section.
+Currently, there's no simple way to find all forms created with Elementor, as they're just widgets (same as all other widgets).
+Plugin helps to find all forms, where they're used and some important settings 
 
 ### TODO:
-* support plugins like Piotnet which could add additional settings for widgets not the new widgets
-* display custom CSS anywhere
+* Show all forms
+* For each form show:
+    * form title
+    * page 
+    * receiver
+    * acceptance?
+    * captcha?
+    * honeypot?

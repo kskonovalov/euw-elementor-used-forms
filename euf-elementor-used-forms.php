@@ -1,53 +1,53 @@
 <?php
 /**
- * Plugin Name: EUW Elementor used widgets
- * Description: Displays the widgets which are currently used by elementor
- * Plugin URI:  https://github.com/kskonovalov/euw-elementor-used-widgets
- * GitHub Plugin URI: https://github.com/kskonovalov/euw-elementor-used-widgets
- * Version: 0.1.1
+ * Plugin Name: EUF Elementor used forms
+ * Description: Displays the forms which are currently used by elementor
+ * Plugin URI:  https://github.com/kskonovalov/euf-elementor-used-forms
+ * GitHub Plugin URI: https://github.com/kskonovalov/euf-elementor-used-forms
+ * Version: 0.1.0
  * Author: Konstantin Konovalov
  * Author URI: https://kskonovalov.me
- * Text Domain: euw-elementor-used-widgets
+ * Text Domain: euf-elementor-used-forms
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
 }
-define( 'EUW_URL', plugin_dir_url( __FILE__ ) );
+define( 'EUF_URL', plugin_dir_url( __FILE__ ) );
 
-function euw_title() {
-  return 'euw-elementor-used-widgets';
+function euf_title() {
+  return 'euf-elementor-used-forms';
 }
 
 // add link to the menu
-add_action( 'admin_menu', 'euw_add_link_to_menu', 999 );
-function euw_add_link_to_menu() {
+add_action( 'admin_menu', 'euf_add_link_to_menu', 999 );
+function euf_add_link_to_menu() {
   add_submenu_page(
     'elementor',
-    'Elementor used widgets',
-    'Used widgets',
+    'Elementor used forms',
+    'Used forms',
     'manage_options',
-    euw_title(),
-    'euw_main_func',
+    euf_title(),
+    'euf_main_func',
     100
   );
 }
 
 // add settings link to the plugins list
-function euw_plugin_settings_link( $links ) {
-  $list_text     = __( 'Used widgets', euw_title() );
-  $settings_link = "<a href='admin.php?page=" . euw_title() . "'>{$list_text}</a>";
+function euf_plugin_settings_link( $links ) {
+  $list_text     = __( 'Used forms', euf_title() );
+  $settings_link = "<a href='admin.php?page=" . euf_title() . "'>{$list_text}</a>";
   array_unshift( $links, $settings_link );
 
   return $links;
 }
 
 $plugin = plugin_basename( __FILE__ );
-add_filter( "plugin_action_links_$plugin", 'euw_plugin_settings_link' );
+add_filter( "plugin_action_links_$plugin", 'euf_plugin_settings_link' );
 
 // page with the result
-function euw_main_func() {
-  $pageTitle = __( "Used elementor widgets", euw_title() );
+function euf_main_func() {
+  $pageTitle = __( "Used elementor forms", euf_title() );
   ?>
     <div class="wrap">
         <h2><?php echo $pageTitle; ?></h2>
@@ -55,28 +55,13 @@ function euw_main_func() {
 
       // Check if Elementor installed and activated
       if ( ! did_action( 'elementor/loaded' ) ) {
-        add_action( 'admin_notices', 'euw_admin_notice_missing_main_plugin' );
+        add_action( 'admin_notices', 'euf_admin_notice_missing_main_plugin' );
         echo "</div>";
 
         return;
       }
 
-      $otherCategoryName = "other";
-      // Get Registered widgets
-      $registeredWidgetsData = \Elementor\Plugin::instance()->widgets_manager->get_widget_types_config( [] );
-      $registeredWidgets     = [];
-      foreach ( $registeredWidgetsData as $widgetID => $widgetFields ) {
-        if ( isset( $widgetFields["categories"] ) && is_array( $widgetFields["categories"] ) ) {
-          foreach ( $widgetFields["categories"] as $category ) {
-            $registeredWidgets[ $category ][] = [
-              "id"    => $widgetID,
-              "title" => $widgetFields["title"]
-            ];
-          }
-        } else {
-          $registeredWidgets[ $otherCategoryName ][] = $widgetID;
-        }
-      }
+      $formWidgetID = "form";
 
       $usedPostTypes    = get_post_types( [] );
       $postTypesToUnset = [
@@ -108,11 +93,10 @@ function euw_main_func() {
         'exclude_from_search' => false
       ] );
 
-      $usedWidgets       = [];
-      $usedWidgetsByPage = [];
+      $formsList       = [];
       foreach ( $posts as $post ) {
         $postData      = [
-          'id'    => $post->ID,
+          'id'    => 15368,//$post->ID,
           'link'  => get_the_permalink( $post ),
           'edit'  => get_edit_post_link( $post ),
           'title' => $post->post_title,
@@ -121,21 +105,18 @@ function euw_main_func() {
         $elementorData = get_post_meta( $postData["id"], '_elementor_data', true );
         if ( ! empty( $elementorData ) ) {
           $elementorJson = json_decode( $elementorData, true );
-          array_walk_recursive( $elementorJson, static function ( $value, $key ) use ( &$usedWidgets, &$usedWidgetsByPage, $postData ) {
-            if ( $key === 'widgetType' ) {
-              $usedWidgets[]                                  = $value;
-              $usedWidgetsByPage[ $value ][ $postData["id"] ] = $postData;
-            }
-          } );
+
+          array_walk($elementorJson,'euf_look_for_forms', $formsList);
         }
       }
+      die(VAR_DUMP($formsList));
 
       $usedColor    = "#b35082";
       $unusedColor  = "#71b350";
       $usedIcon     = "&check;";
       $unusedIcon   = "&cross;";
-      $categoryText = __( "Category", euw_title() );
-      $editText     = __( "Edit", euw_title() );
+      $categoryText = __( "Category", euf_title() );
+      $editText     = __( "Edit", euf_title() );
       echo '<table cellspacing="0" cellpadding="0" class="widefat fixed" style="width: 800px; max-width: 100%;">';
       foreach ( $registeredWidgets as $categoryName => $category ) {
         echo "<thead><tr><th class='manage-column' style='width: 200px;'><b>{$categoryText}:</b> {$categoryName}</th><th class='manage-column'>Page</th></tr></thead><tbody>";
@@ -177,16 +158,25 @@ function euw_main_func() {
     </div>
   <?php
 }
+function euf_look_for_forms(&$value, $key, &$formsList){
+    if(is_array($value)){
+        if(isset($value["widgetType"]) && $value["widgetType"] === "form") {
+          VAR_DUMP($value["widgetType"]);
+            $formsList[] = $value;
+        }
+        array_walk($value,'euf_look_for_forms', $formsList);
+    }
+}
 
-function euw_admin_notice_missing_main_plugin() {
+function euf_admin_notice_missing_main_plugin() {
 
   if ( isset( $_GET['activate'] ) ) unset( $_GET['activate'] );
 
   $message = sprintf(
   /* translators: 1: Plugin name 2: Elementor */
     esc_html__( '"%1$s" requires "%2$s" to be installed and activated.', 'elementor-test-extension' ),
-    '<strong>' . esc_html__( 'Elementor used widgets', 'elementor-test-extension' ) . '</strong>',
-    '<strong>' . esc_html__( 'Elementor', euw_title() ) . '</strong>'
+    '<strong>' . esc_html__( 'Elementor used forms', 'elementor-test-extension' ) . '</strong>',
+    '<strong>' . esc_html__( 'Elementor', euf_title() ) . '</strong>'
   );
 
   printf( '<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message );
