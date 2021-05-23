@@ -96,7 +96,7 @@ function euf_main_func() {
       $formsList       = [];
       foreach ( $posts as $post ) {
         $postData      = [
-          'id'    => 15368,//$post->ID,
+          'id'    => $post->ID,
           'link'  => get_the_permalink( $post ),
           'edit'  => get_edit_post_link( $post ),
           'title' => $post->post_title,
@@ -105,8 +105,9 @@ function euf_main_func() {
         $elementorData = get_post_meta( $postData["id"], '_elementor_data', true );
         if ( ! empty( $elementorData ) ) {
           $elementorJson = json_decode( $elementorData, true );
-
-          array_walk($elementorJson,'euf_look_for_forms', $formsList);
+          foreach($elementorJson as $key => $value) {
+            euf_look_for_forms($key, $value, $formsList, $postData);
+          }
         }
       }
       die(VAR_DUMP($formsList));
@@ -158,13 +159,15 @@ function euf_main_func() {
     </div>
   <?php
 }
-function euf_look_for_forms(&$value, $key, &$formsList){
+function euf_look_for_forms($key, $value, &$formsList, $postData){
     if(is_array($value)){
         if(isset($value["widgetType"]) && $value["widgetType"] === "form") {
-          VAR_DUMP($value["widgetType"]);
-            $formsList[] = $value;
+            $formsList[$postData["id"]][] = $value;
+        } else {
+          foreach ( $value as $keyIN => $valueIN ) {
+            euf_look_for_forms( $keyIN, $valueIN, $formsList, $postData );
+          }
         }
-        array_walk($value,'euf_look_for_forms', $formsList);
     }
 }
 
