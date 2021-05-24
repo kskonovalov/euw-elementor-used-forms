@@ -166,8 +166,9 @@ ROW;
             $recaptcha3 = in_array( "recaptcha_v3", $formFields ) ? $check : $times;
             $honeypot   = in_array( "honeypot", $formFields ) ? $check : $times;
 
+            /* by default form action is email and collect form submissions */
             $formActions = "email";
-            $collectSubmissions = $times;
+            $collectSubmissions = $check;
             if ( isset( $form["settings"]["submit_actions"] ) && is_array( $form["settings"]["submit_actions"] ) ) {
               $formActions = implode( ", ", $form["settings"]["submit_actions"] );
               $collectSubmissions = in_array( "save-to-database", $form["settings"]["submit_actions"] ) ? $check : $times;
