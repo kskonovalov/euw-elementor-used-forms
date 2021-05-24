@@ -93,65 +93,40 @@ function euf_main_func() {
         'exclude_from_search' => false
       ] );
 
-      $formsList       = [];
+      $formsList = [];
       foreach ( $posts as $post ) {
-        $postData      = [
-          'id'    => $post->ID,
-          'link'  => get_the_permalink( $post ),
-          'edit'  => get_edit_post_link( $post ),
-          'title' => $post->post_title,
-          'type'  => $post->post_type
-        ];
-        $elementorData = get_post_meta( $postData["id"], '_elementor_data', true );
+        $elementorData = get_post_meta( $post->ID, '_elementor_data', true );
         if ( ! empty( $elementorData ) ) {
           $elementorJson = json_decode( $elementorData, true );
-          foreach($elementorJson as $key => $value) {
-            euf_look_for_forms($key, $value, $formsList, $postData);
+          foreach ( $elementorJson as $key => $value ) {
+            euf_look_for_forms( $key, $value, $formsList, $post->ID );
           }
         }
       }
-      die(VAR_DUMP($formsList));
 
-      $usedColor    = "#b35082";
-      $unusedColor  = "#71b350";
-      $usedIcon     = "&check;";
-      $unusedIcon   = "&cross;";
-      $categoryText = __( "Category", euf_title() );
-      $editText     = __( "Edit", euf_title() );
+      $titlePage = __( "Page", euf_title() );
+      $editText  = __( "Edit the page", euf_title() );
+      $titleForm  = __( "Form", euf_title() );
+      $titleEmail  = __( "E-mail to", euf_title() );
+      $titleEmail2  = __( "E-mail to 2", euf_title() );
       echo '<table cellspacing="0" cellpadding="0" class="widefat fixed" style="width: 800px; max-width: 100%;">';
-      foreach ( $registeredWidgets as $categoryName => $category ) {
-        echo "<thead><tr><th class='manage-column' style='width: 200px;'><b>{$categoryText}:</b> {$categoryName}</th><th class='manage-column'>Page</th></tr></thead><tbody>";
-        foreach ( $category as $widget ) {
-          if ( empty( $widget["id"] ) ) {
-            // TODO: check skipped?
-            continue;
+            echo "<thead><tr><th class='manage-column'><b>{$titleForm}</b></th><th class='manage-column'><b>{$titleEmail}</b></th><th class='manage-column'><b>{$titleEmail2}</b></th></tr></thead><tbody>";
+      foreach ( $posts as $post ) {
+        if ( isset( $formsList[ $post->ID ] ) ) {
+          $link     = get_the_permalink( $post );
+          $editLink = get_edit_post_link( $post );
+          $editLink = str_replace("action=edit", "action=elementor", $editLink);
+          echo <<<ROW
+<tr><td colspan="2"><h4><a href="{$link}" target="_blank">{$post->post_title}</a> (<a href='{$editLink}' title='{$editText}' target='_blank'>{$editText}</a>)</h4></td></tr>
+ROW;
+          foreach($formsList[ $post->ID ] as $form) {
+              $formName = $form["settings"]["form_name"];
+              $emailTo = $form["settings"]["email_to"];
+              $emailTo2 = $form["settings"]["email_to_2"];
+            echo <<<ROW
+<tr><td><b>{$formName}</b></td><td>{$emailTo}</td><td>{$emailTo2}</td></tr>
+ROW;
           }
-
-          $title = "";
-          if ( ! empty( $widget["title"] ) ) {
-            $title = $widget["title"];
-          } else if ( ! empty( $widget["id"] ) ) {
-            $title = $widget["id"];
-          }
-          if ( in_array( $widget["id"], $usedWidgets, true ) ) {
-            $posts       = [];
-            $statusColor = $usedColor;
-            $statusIcon  = $usedIcon;
-            if ( isset( $usedWidgetsByPage[ $widget["id"] ] ) && is_array( $usedWidgetsByPage[ $widget["id"] ] ) ) {
-              foreach ( $usedWidgetsByPage[ $widget["id"] ] as $usedInPages ) {
-                $posts[] = "<a href='{$usedInPages["link"]}' title='{$usedInPages["title"]}' target='_blank'>{$usedInPages["title"]}</a>
-<a href='{$usedInPages["edit"]}' title='{$editText}' target='_blank'>(&para;)</a>";
-              }
-            }
-            $posts = implode( ", ", $posts );
-          } else {
-            $posts       = "";
-            $statusColor = $unusedColor;
-            $statusIcon  = $unusedIcon;
-          }
-
-
-          echo "<tr><td style='color: {$statusColor}; width: 30px;'>{$statusIcon} {$title}</td><td>{$posts}</td></tr>";
         }
       }
       echo '</tbody></table>';
@@ -159,21 +134,24 @@ function euf_main_func() {
     </div>
   <?php
 }
-function euf_look_for_forms($key, $value, &$formsList, $postData){
-    if(is_array($value)){
-        if(isset($value["widgetType"]) && $value["widgetType"] === "form") {
-            $formsList[$postData["id"]][] = $value;
-        } else {
-          foreach ( $value as $keyIN => $valueIN ) {
-            euf_look_for_forms( $keyIN, $valueIN, $formsList, $postData );
-          }
-        }
+
+function euf_look_for_forms( $key, $value, &$formsList, $postID ) {
+  if ( is_array( $value ) ) {
+    if ( isset( $value["widgetType"] ) && $value["widgetType"] === "form" ) {
+      $formsList[ $postID ][] = $value;
+    } else {
+      foreach ( $value as $keyIN => $valueIN ) {
+        euf_look_for_forms( $keyIN, $valueIN, $formsList, $postID );
+      }
     }
+  }
 }
 
 function euf_admin_notice_missing_main_plugin() {
 
-  if ( isset( $_GET['activate'] ) ) unset( $_GET['activate'] );
+  if ( isset( $_GET['activate'] ) ) {
+    unset( $_GET['activate'] );
+  }
 
   $message = sprintf(
   /* translators: 1: Plugin name 2: Elementor */
