@@ -104,28 +104,68 @@ function euf_main_func() {
         }
       }
 
-      $titlePage = __( "Page", euf_title() );
-      $editText  = __( "Edit the page", euf_title() );
-      $titleForm  = __( "Form", euf_title() );
-      $titleEmail  = __( "E-mail to", euf_title() );
-      $titleEmail2  = __( "E-mail to 2", euf_title() );
+      $editText        = __( "Edit in elementor", euf_title() );
+      $titleForm       = __( "Form", euf_title() );
+      $titleEmail      = __( "E-mail to", euf_title() );
+      $titleRecaptcha  = __( "Recaptcha", euf_title() );
+      $titleRecaptcha3 = __( "Recaptcha v3", euf_title() );
+      $titleHoneypot   = __( "Honeypot", euf_title() );
+      $titleEmail2     = __( "E-mail to 2", euf_title() );
+      $titleActions    = __( "Actions", euf_title() );
+      $check = "<span style='color:green; font-size: 30px;'>&check;</span>";
+      $times = "<span style='color:#530101; font-size: 26px;'>&times;</span>";
       echo '<table cellspacing="0" cellpadding="0" class="widefat fixed" style="width: 800px; max-width: 100%;">';
-            echo "<thead><tr><th class='manage-column'><b>{$titleForm}</b></th><th class='manage-column'><b>{$titleEmail}</b></th><th class='manage-column'><b>{$titleEmail2}</b></th></tr></thead><tbody>";
+      echo "<thead><tr>";
+      echo "<th class='manage-column'><b>{$titleForm}</b></th>";
+      echo "<th class='manage-column'><b>{$titleEmail}</b></th>";
+      echo "<th class='manage-column'><b>{$titleEmail2}</b></th>";
+      echo "<th class='manage-column'><b>{$titleRecaptcha}</b></th>";
+      echo "<th class='manage-column'><b>{$titleRecaptcha3}</b></th>";
+      echo "<th class='manage-column'><b>{$titleHoneypot}</b></th>";
+      echo "<th class='manage-column'><b>{$titleActions}</b></th>";
+      echo "</tr></thead><tbody>";
       foreach ( $posts as $post ) {
         if ( isset( $formsList[ $post->ID ] ) ) {
           $link     = get_the_permalink( $post );
           $editLink = get_edit_post_link( $post );
-          $editLink = str_replace("action=edit", "action=elementor", $editLink);
+          $editLink = str_replace( "action=edit", "action=elementor", $editLink );
           echo <<<ROW
-<tr><td colspan="2"><h4><a href="{$link}" target="_blank">{$post->post_title}</a> (<a href='{$editLink}' title='{$editText}' target='_blank'>{$editText}</a>)</h4></td></tr>
+<tr><td colspan="7"><h3><a href="{$link}" target="_blank">{$post->post_title}</a></h3> (<a href='{$editLink}' title='{$editText}' target='_blank'>{$editText}</a>)</td></tr>
 ROW;
-          foreach($formsList[ $post->ID ] as $form) {
-              $formName = $form["settings"]["form_name"];
-              $emailTo = $form["settings"]["email_to"];
+          foreach ( $formsList[ $post->ID ] as $form ) {
+            $formName = $form["settings"]["form_name"];
+            $emailTo  = $form["settings"]["email_to"];
+            $emailTo2 = "";
+            if(isset($form["settings"]["submit_actions"]) && in_array("email2", $form["settings"]["submit_actions"])) {
               $emailTo2 = $form["settings"]["email_to_2"];
-            echo <<<ROW
-<tr><td><b>{$formName}</b></td><td>{$emailTo}</td><td>{$emailTo2}</td></tr>
-ROW;
+            }
+            $formFields = [];
+            foreach($form["settings"]["form_fields"] as $field) {
+                if(isset($field["field_label"]) && !empty($field["field_label"])) {
+                    $formFields[] = $field["field_label"];
+                } else if(isset($field["placeholder"]) && !empty($field["placeholder"])) {
+                  $formFields[] = $field["placeholder"];
+                } else if(isset($field["field_type"]) && !empty($field["field_type"])) {
+                  $formFields[] = $field["field_type"];
+                }
+            }
+            $recaptcha = in_array("recaptcha", $formFields) ? $check : $times;
+            $recaptcha3 = in_array("recaptcha_v3", $formFields) ? $check : $times;
+            $honeypot = in_array("honeypot", $formFields) ? $check : $times;
+
+            $formActions = "email";
+            if(isset($form["settings"]["submit_actions"]) && is_array($form["settings"]["submit_actions"])) {
+              $formActions = implode( ", ", $form["settings"]["submit_actions"] );
+            }
+            echo "<tr>";
+            echo "<td class='manage-column'><h4>{$formName}</h4></td>";
+            echo "<td class='manage-column'>{$emailTo}</td>";
+            echo "<td class='manage-column'>{$emailTo2}</td>";
+            echo "<td class='manage-column'>{$recaptcha}</td>";
+            echo "<td class='manage-column'>{$recaptcha3}</td>";
+            echo "<td class='manage-column'>{$honeypot}</td>";
+            echo "<td class='manage-column'>{$formActions}</td>";
+            echo "</tr>";
           }
         }
       }
