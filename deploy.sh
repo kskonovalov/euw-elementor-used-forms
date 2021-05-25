@@ -3,16 +3,16 @@
 # The difference is that this script lives in the plugin's git repo & doesn't require an existing SVN repo.
 
 # main config
-PLUGINSLUG="euw-elementor-used-widgets"
+PLUGINSLUG="euf-elementor-used-forms"
 CURRENTDIR=`pwd`
-MAINFILE="euw-elementor-used-widgets.php" # this should be the name of your main php file in the wordpress plugin
+MAINFILE="euf-elementor-used-forms.php" # this should be the name of your main php file in the wordpress plugin
 
 # git config
 GITPATH="$CURRENTDIR/" # this file should be in the base of your git repository
 
 # svn config
 SVNPATH="/tmp/$PLUGINSLUG" # path to a temp SVN repo. No trailing slash required and don't add trunk.
-SVNURL="https://plugins.svn.wordpress.org/euw-elementor-used-widgets" # Remote SVN repo on wordpress.org, with trailing slash
+SVNURL="https://plugins.svn.wordpress.org/euf-elementor-used-forms" # Remote SVN repo on wordpress.org, with trailing slash
 SVNUSER="dependencyinjection" # your svn username
 
 
