@@ -4,14 +4,4 @@
 
 ### Purpose:
 Currently, there's no simple way to find all forms created with Elementor, as they're just widgets (same as all other widgets).
-Plugin helps to find all forms, where they're used and some important settings 
-
-### TODO:
-* Show all forms
-* For each form show:
-    * form title
-    * page 
-    * receiver
-    * acceptance?
-    * captcha?
-    * honeypot?
+Plugin helps to find all forms, pages where they're used and some important settings like reCaptcha, Honeypot, Saving form submissions to the DB enabled 
