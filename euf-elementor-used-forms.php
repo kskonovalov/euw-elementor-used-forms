@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: EUF Elementor used forms
- * Description: Displays the forms which are currently used by Elementor
+ * Description: Simple way to check all Elementor forms (Elementor Pro Form widget) through the site
  * Plugin URI:  https://github.com/kskonovalov/euf-elementor-used-forms
  * GitHub Plugin URI: https://github.com/kskonovalov/euf-elementor-used-forms
  * Version: 0.1.0
