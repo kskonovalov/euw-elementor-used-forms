@@ -2,8 +2,9 @@
 
 # Used Elementor Forms plugin for WordPress
 
-Simple way to check all Elementor forms (Elementor Pro Form widget) through the site
+Simple way to check all Elementor forms
 
 ### Purpose:
-Currently, there's no simple way to find all forms created with Elementor, as they're just widgets (same as all other widgets).
-Plugin helps to find all forms, pages where they're used and some important settings like reCaptcha, Honeypot, Saving form submissions to the DB enabled 
+Simple way to check all Elementor forms (Elementor Pro Form widget) through the site.
+Out of the box there's no simple way to find all the forms created with Elementor, as they're just widgets (same as all other widgets).
+This plugin helps to find all forms, pages where they're used and some important settings like reCaptcha, Honeypot, Saving form submissions to the DB enabled.
