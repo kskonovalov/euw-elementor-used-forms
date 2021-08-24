@@ -4,7 +4,7 @@
  * Description: Simple way to check all Elementor forms (Elementor Pro Form widget) through the site
  * Plugin URI:  https://github.com/kskonovalov/euf-elementor-used-forms
  * GitHub Plugin URI: https://github.com/kskonovalov/euf-elementor-used-forms
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: Konstantin Konovalov
  * Author URI: https://kskonovalov.me
  * Text Domain: euf-elementor-used-forms

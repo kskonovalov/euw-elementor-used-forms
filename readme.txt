@@ -4,7 +4,7 @@ Tags: elementor, forms
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 5.6.20
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPL v2 or later
 
 Simple way to check all Elementor forms
